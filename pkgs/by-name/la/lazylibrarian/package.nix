@@ -31,16 +31,8 @@ python3Packages.buildPythonApplication {
 
   dependencies = with python3Packages; [
     beautifulsoup4
-    # html5lib
-    # webencodings
-    # requests
-    # urllib3
-    # pyopenssl
-    # cherrypy
-    # cherrypy-cors
     apprise
     apscheduler
-
     cherrypy
     cherrypy-cors
     deluge-client
@@ -61,6 +53,17 @@ python3Packages.buildPythonApplication {
     webencodings
   ];
 
+  # TODO
+  #disabled = pythonOlder "3.7";
+  # TODO: Runtime deps
+  # xvfb (calibre)
+  # libnss, python3-openssl, python3-oauth ?
+  # TODO: Optional
+  # imagemagick, ghostscript, python3-pythonmagick, python3-wand (for generating covers and the like)
+  # rename (helps manipulate filenames, because ebook and audiobook naming is awful)
+  # id3v2 and id3tool (helps manipulate id3 tags because ebook and audiobook tagging is awful. Supposedly id3 v1 is sufficient, but you really need the v2 tool. If you are a super miser on space, skip id3tool)
+  # unzip (another file/metadata helper)
+  # ffmpeg (audiobook)
   nativeCheckInputs = with python3Packages; [
     pytest
     pytest-cov
