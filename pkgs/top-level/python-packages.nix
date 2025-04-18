@@ -4781,6 +4781,7 @@ self: super: with self; {
 
   ewmh = callPackage ../development/python-modules/ewmh { };
 
+  ez-setup = callPackage ../development/python-modules/ez-setup {};
   ewmhlib = callPackage ../development/python-modules/ewmhlib { };
 
   example-robot-data = toPythonModule (
