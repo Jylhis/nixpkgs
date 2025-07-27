@@ -12,6 +12,7 @@
   zstd,
   expat,
   withRpm ? !stdenv.hostPlatform.isDarwin,
+  withDebian ? true,
   rpm,
   db,
   withConda ? true,
@@ -30,6 +31,7 @@ stdenv.mkDerivation rec {
 
   cmakeFlags = [
     "-DENABLE_COMPLEX_DEPS=true"
+    (lib.cmakeBool "ENABLE_DEBIAN" withDebian)
     (lib.cmakeBool "ENABLE_CONDA" withConda)
     "-DENABLE_LZMA_COMPRESSION=true"
     "-DENABLE_BZIP2_COMPRESSION=true"
