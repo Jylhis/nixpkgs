@@ -15,6 +15,8 @@
   libselinux,
   nix-update-script,
   doxygen,
+  sphinx,
+  selinuxSupport ? false,
 }:
 
 stdenv.mkDerivation rec {
@@ -25,6 +27,7 @@ stdenv.mkDerivation rec {
     "out"
     "dev"
     "py"
+    "doc"
   ];
 
   src = fetchFromGitHub {
@@ -38,8 +41,12 @@ stdenv.mkDerivation rec {
     cmake
     pkg-config
     doxygen
+    sphinx
   ];
 
+  separateDebugInfo = true;
+
+  cmakeBuildType = "RelWithDebInfo";
   buildInputs = [
     python
     libxml2
@@ -49,8 +56,7 @@ stdenv.mkDerivation rec {
     check
     gpgme
     zchunk
-    libselinux
-  ];
+  ] ++ lib.optionals selinuxSupport [libselinux];
 
   # librepo/fastestmirror.h includes curl/curl.h, and pkg-config specfile refers to others in here
   propagatedBuildInputs = [
@@ -59,11 +65,26 @@ stdenv.mkDerivation rec {
     libxml2
   ];
 
-  cmakeFlags = [ "-DPYTHON_DESIRED=${lib.substring 0 1 python.pythonVersion}" ];
+  cmakeFlags = [
+    "-DPYTHON_DESIRED=${lib.substring 0 1 python.pythonVersion}"
+    (lib.cmakeBool "ENABLE_SELINUX" selinuxSupport)
+  ];
 
   postFixup = ''
     moveToOutput "lib/${python.libPrefix}" "$py"
+    mkdir -p "$dev/share/cmake/${pname}"
+    cp "../utils/FindLibrepo.cmake" "$dev/share/cmake/${pname}"
   '';
+
+  postBuild =''
+    make doc
+    mkdir -p $doc/share/doc/${pname}/html
+    cp -r doc/c/html $doc/share/doc/${pname}/html/c
+    cp -r doc/python $doc/share/doc/${pname}/html/python
+    rm $doc/share/doc/${pname}/html/python/*.cmake
+    rm -r $doc/share/doc/${pname}/html/python/CMakeFiles
+    rm $doc/share/doc/${pname}/html/python/Makefile
+    '';
 
   passthru.updateScript = nix-update-script { };
 
