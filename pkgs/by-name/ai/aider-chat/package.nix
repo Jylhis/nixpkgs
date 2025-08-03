@@ -8,6 +8,7 @@
   portaudio,
   playwright-driver,
   nix-update-script,
+  installShellFiles,
 }:
 
 let
@@ -35,6 +36,8 @@ let
     pythonRelaxDeps = true;
 
     build-system = with python3Packages; [ setuptools-scm ];
+
+    nativeBuildInputs = [ installShellFiles ];
 
     dependencies = with python3Packages; [
       aiohappyeyeballs
@@ -215,6 +218,12 @@ let
         boto3
       ];
     };
+
+    postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
+      installShellCompletion --cmd aider \
+        --bash <($out/bin/aider --shell-completions bash) \
+        --zsh <($out/bin/aider --shell-completions zsh)
+    '';
 
     passthru = {
       withOptional =
